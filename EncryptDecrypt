@@ -1,0 +1,92 @@
+/******************************************
+ Write a program that can encrypt and decrypt
+ using the affine cipher described here:
+ C = E(|a,b|, p) = (ap + b) mod 26
+*******************************************/
+
+#include <iostream>
+#include <istream>
+#include <iomanip>
+#include <cstdlib>
+
+using namespace std;
+
+const int STRINGLEN = 10 + 1;
+const char alphabet[26] = { 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z' };
+
+int toVal(char c) {
+	for (int x = 0; x < 26; x++) {
+		if (toupper(c) == alphabet[x])
+			return x;
+	}
+	return 99;
+}
+
+char toChar(int i) {
+	if (i >= 0 && i <= 25)
+		return alphabet[i];
+	else
+		return ' ';
+}
+
+int findInverseMod(int x) {
+	if (x % 2 != 0 && x >= 1 && x <= 25) {
+		int i = 0;
+		while ((x * i) % 26 != 1) {
+			i++;
+		}
+		return i;
+	}
+	return 999;
+}
+
+char encrypt(int a, char input, int b) {
+	if (toVal(input) <= 25)
+		return toChar( ((a * toVal(input)) + b) % 26);
+	else
+		return ' ';
+}
+
+void decrypt(int a, char input, int b) {
+	if (findInverseMod(a) == 99) {
+		cout << "Cannot decrypt with \"a\"!";
+		return;
+	}
+	if (toVal(input) <= 25)
+		cout << toChar(
+			findInverseMod(a) * (toVal(input) - b) % 26
+		);
+	else
+		cout << ' ';
+}
+
+int main()
+{
+	int a = 0, b = 0;
+	char input[STRINGLEN];
+	char encrypted[STRINGLEN] = { "" };
+
+	cout << "a? ";
+	cin >> a;
+	
+	cout << "b? ";
+	cin >> b;
+
+	cout << "What is your text? ";
+	cin >> setw(10) >> input;
+
+	cout << "\nEncrypted text: ";
+	for (int i = 0; i < sizeof(input); i++) {
+		encrypted[i] = encrypt(a, input[i], b);
+		cout << encrypted[i];
+	}
+
+	cout << "\nDecrypted text: ";
+	for (int i = 0; i < sizeof(encrypted); i++) {
+		decrypt(a, encrypted[i], b);
+	}
+
+	cout << endl;
+
+	return 0;
+}
